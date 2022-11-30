@@ -1,0 +1,16 @@
+{
+    "produtos": [
+        {
+            "id": 1,
+            "nome": "Moranguinho do nordeste",
+            "preco": 2,
+            "quantidade": 1
+        },
+        {
+            "id": 2,
+            "nome": "Verdinha",
+            "preco": 4.2,
+            "quantidade": 1
+        }
+    ]
+}
