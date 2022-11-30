@@ -19,6 +19,7 @@ def home():
 
 
 # Rota de cadastro
+
 '''{"id":1,
 "nome": "Tomate",
 "preco":5.00,
@@ -47,18 +48,19 @@ def atualizar(nome):
             {'nome': produto['nome']},
             {'$set':
                 {
-                'nome': produto['nome'],
-                'preco': produto['preco'],
-                'descricao': produto['descricao']
+                    'nome': produto['nome'],
+                    'preco': produto['preco'],
+                    'descricao': produto['descricao']
                 }
-            }
+             }
         )
         return produto, 200
     else:
         return {'erro': "Produto não encontrado!"}, 404
 
 
-# Rota de consulta)
+# Rota de consulta
+
 @app.route('/consulta/<nome>', methods=['GET'])
 def consultar(nome):
     produto = db.produtos.find_one({'nome': nome})
