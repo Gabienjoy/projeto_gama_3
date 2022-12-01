@@ -35,13 +35,48 @@ def cadastrar():
         return {'erro': 'Esperava receber um json no corpo da requisição'}, 400
 
 
+# Rota de alteração
+
+@app.route('/atualizacao/<nome>', methods=['PUT'])
+def atualizar(nome):
+    produto, status = consultar(nome)
+    if status == 200:
+        request.get_json(silent=True)
+        produto = request.json
+        db.produtos.update_one(
+            {'nome': produto['nome']},
+            {'$set':
+                {
+                    'nome': produto['nome'],
+                    'preco': produto['preco'],
+                    'descricao': produto['descricao']
+                }
+             }
+        )
+        return produto, 200
+    else:
+        return {'erro': "Produto não encontrado!"}, 404
+
+
 # Rota de consulta
 
-@app.route('/consultar/<nome>', methods=['GET'])
-def consultar_nome(nome):
-    produto = db.produtos.find_one({'nome': nome}, {'_id': False})
+@app.route('/consulta/<nome>', methods=['GET'])
+def consultar(nome):
+    produto = db.produtos.find_one({'nome': nome})
     if produto:
         return produto, 200
+    else:
+        return {'error': 'Produto não encontrado!'}, 404
+
+
+# Rota de deleção
+
+@app.route('/delecao/<nome>', methods=['DELETE'])
+def deletar(nome):
+    produto = db.produtos.find_one({'nome': nome})
+    if produto:
+        db.produtos.delete_one({'nome': nome})
+        return {'message': 'Produto deletado com sucesso!'}, 200
     else:
         return {'error': 'Produto não encontrado!'}, 404
 
