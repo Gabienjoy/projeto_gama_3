@@ -15,14 +15,18 @@ db = conn['projeto_3']
 
 @app.route('/')
 def home():
-    return "Olá, to funfando"
+    return "Bem-vindo(a)!"
 
 
 # Rota de cadastro
-'''{"id":1,
+'''
+{
+"_id":1,
 "nome": "Tomate",
 "preco":5.00,
-"descricao":"Tomate eh fruta"}'''
+"descricao":"Tomate eh fruta"
+}
+'''
 
 
 @app.route('/cadastro', methods=['POST'])
