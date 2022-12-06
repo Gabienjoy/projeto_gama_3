@@ -182,3 +182,182 @@ def test_route_relatorio_por_produto_data(client, mocker):
             }
         ]
     }
+
+def test_route_vendas_limpar_status(client, mocker):
+    mocker.patch('app.services.ORM.limpar_vendas', return_value=True)
+    response = client.get('/vendas/limpar')
+    assert response.status_code == 200
+
+def test_route_vendas_limpar_data(client, mocker):
+    mocker.patch('app.services.ORM.limpar_vendas', return_value=True)
+    response = client.get('/vendas/limpar')
+    decoded_response = dict(ast.literal_eval(response.data.decode('utf-8')))
+
+    assert decoded_response == {
+        "200": "Vendas limpadas com sucesso."
+    }
+
+def test_route_listar_vendas_status(client, mocker):
+    mocker.patch('app.services.ORM.consultar_vendas', return_value={
+        "compras": [
+            {
+                "id": 2,
+                "items": [
+                    {
+                        "id": 1,
+                        "nome": "Moranguinho do nordeste",
+                        "preco": 2.0,
+                        "quantidade": 1
+                    },
+                    {
+                        "id": 2,
+                        "nome": "Verdinha",
+                        "preco": 4.2,
+                        "quantidade": 3
+                    },
+                    {
+                        "id": 10,
+                        "nome": "Juromeuga",
+                        "preco": 32.0,
+                        "quantidade": 4
+                    }
+                ],
+                "valor_total": 142.6
+            },
+            {
+                "id": 3,
+                "items": [
+                    {
+                        "id": 1,
+                        "nome": "Moranguinho do nordeste",
+                        "preco": 2.0,
+                        "quantidade": 1
+                    },
+                    {
+                        "id": 2,
+                        "nome": "Verdinha",
+                        "preco": 4.2,
+                        "quantidade": 3
+                    },
+                    {
+                        "id": 10,
+                        "nome": "Juromeuga",
+                        "preco": 32.0,
+                        "quantidade": 4
+                    }
+                ],
+                "valor_total": 142.6
+            }
+        ]
+    })
+    response = client.get('/vendas')
+    assert response.status_code == 200
+
+def test_route_listar_vendas_data(client, mocker):
+    mocker.patch('app.services.ORM.consultar_vendas', return_value={
+        "compras": [
+            {
+                "id": 2,
+                "items": [
+                    {
+                        "id": 1,
+                        "nome": "Moranguinho do nordeste",
+                        "preco": 2.0,
+                        "quantidade": 1
+                    },
+                    {
+                        "id": 2,
+                        "nome": "Verdinha",
+                        "preco": 4.2,
+                        "quantidade": 3
+                    },
+                    {
+                        "id": 10,
+                        "nome": "Juromeuga",
+                        "preco": 32.0,
+                        "quantidade": 4
+                    }
+                ],
+                "valor_total": 142.6
+            },
+            {
+                "id": 3,
+                "items": [
+                    {
+                        "id": 1,
+                        "nome": "Moranguinho do nordeste",
+                        "preco": 2.0,
+                        "quantidade": 1
+                    },
+                    {
+                        "id": 2,
+                        "nome": "Verdinha",
+                        "preco": 4.2,
+                        "quantidade": 3
+                    },
+                    {
+                        "id": 10,
+                        "nome": "Juromeuga",
+                        "preco": 32.0,
+                        "quantidade": 4
+                    }
+                ],
+                "valor_total": 142.6
+            }
+        ]
+    })
+    response = client.get('/vendas')
+    decoded_response = dict(ast.literal_eval(response.data.decode('utf-8')))
+
+    assert decoded_response == {
+        "compras": [
+            {
+                "id": 2,
+                "items": [
+                    {
+                        "id": 1,
+                        "nome": "Moranguinho do nordeste",
+                        "preco": 2.0,
+                        "quantidade": 1
+                    },
+                    {
+                        "id": 2,
+                        "nome": "Verdinha",
+                        "preco": 4.2,
+                        "quantidade": 3
+                    },
+                    {
+                        "id": 10,
+                        "nome": "Juromeuga",
+                        "preco": 32.0,
+                        "quantidade": 4
+                    }
+                ],
+                "valor_total": 142.6
+            },
+            {
+                "id": 3,
+                "items": [
+                    {
+                        "id": 1,
+                        "nome": "Moranguinho do nordeste",
+                        "preco": 2.0,
+                        "quantidade": 1
+                    },
+                    {
+                        "id": 2,
+                        "nome": "Verdinha",
+                        "preco": 4.2,
+                        "quantidade": 3
+                    },
+                    {
+                        "id": 10,
+                        "nome": "Juromeuga",
+                        "preco": 32.0,
+                        "quantidade": 4
+                    }
+                ],
+                "valor_total": 142.6
+            }
+        ]
+    }

@@ -1,6 +1,6 @@
 
 from sqlalchemy import create_engine, update, Column, Float, String, Integer, TIMESTAMP, ForeignKey, func
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
@@ -89,7 +89,6 @@ def relatorio_total_vendas() -> dict:
 
     return vendas
 
-
 def relatorio_rank_vendidos() -> dict:
     session = Session()
     vendas = {
@@ -105,3 +104,39 @@ def relatorio_rank_vendidos() -> dict:
         vendas["rank_vendidos"].append(dict(venda))
 
     return vendas
+
+def limpar_vendas():
+    session = Session()
+    session.query(Transacoes).delete()
+    session.query(Compras).delete()
+    session.commit()
+    session.close()
+
+def consultar_vendas():
+    session = Session()
+    compras = {
+        "compras": []
+    }
+    for compra in session.query(Compras).all():
+        compras["compras"].append({
+            "id": compra.__dict__["id"],
+            "items": [],
+            "valor_total": 0
+        })
+    for transacao in session.query(Transacoes).all():
+        for compra in compras["compras"]:
+            if transacao.__dict__["id_compra"] == compra["id"]:
+                compra["items"].append({
+                    "id": transacao.__dict__["id_produto"],
+                    "quantidade": transacao.__dict__["quantidade"]
+                })
+                compra["valor_total"] += transacao.__dict__["valor_total"]
+    for produto in session.query(Produtos).all():
+        for compra in compras["compras"]:
+            for item in compra["items"]:
+                if item["id"] == produto.__dict__["id"]:
+                    item["nome"] = produto.__dict__["nome"]
+                    item["preco"] = produto.__dict__["preco"]
+    
+    session.close()
+    return compras
