@@ -37,12 +37,12 @@ def cadastrar():
 
 # Rota de alteração
 
-@app.route('/atualizacao/<nome>', methods=['PUT'])
-def atualizar(nome):
-    produto, status = consultar(nome)
+@app.route('/atualizacao/', methods=['PUT'])
+def atualizar():
+    request.get_json(silent=True)
+    produto = request.json
+    _, status = consultar(produto['nome'])
     if status == 200:
-        request.get_json(silent=True)
-        produto = request.json
         db.produtos.update_one(
             {'nome': produto['nome']},
             {'$set':
