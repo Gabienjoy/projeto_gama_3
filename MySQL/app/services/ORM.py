@@ -4,7 +4,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
-engine = create_engine('mysql+mysqlconnector://root:root@172.17.0.3:3306/projeto', echo=True)
+# docker inspect <container_id>
+engine = create_engine('mysql+mysqlconnector://root:root@172.17.0.2:3306/projeto', echo=True)
 
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
@@ -70,4 +71,37 @@ def relatorio_por_produto() -> dict:
         func.sum(Transacoes.valor_total).label('valor_total')
     ).group_by(Transacoes.id_produto, Produtos.nome).all():
         vendas["vendas_por_produto"].append(dict(venda))
+    return vendas
+
+def relatorio_total_vendas() -> dict:
+    session = Session()
+    vendas = {
+        "total_vendas": None
+    }
+
+    for venda in session.query(Transacoes).with_entities(
+        func.sum(Transacoes.quantidade).cast(Integer).label('qtd_produtos_vendidos'),
+        func.sum(Transacoes.valor_total).label('valor_total')
+    ).all():
+        vendas["total_vendas"] = dict(venda)
+
+    vendas["total_vendas"]["qtd_vendas"] = session.query(Compras).count()
+
+    return vendas
+
+
+def relatorio_rank_vendidos() -> dict:
+    session = Session()
+    vendas = {
+        "rank_vendidos": []
+    }
+
+    for venda in session.query(Transacoes).join(Produtos).with_entities(
+        Produtos.id,
+        Produtos.nome,
+        func.sum(Transacoes.quantidade).cast(Integer).label('qtd_produtos_vendidos'),
+        func.sum(Transacoes.valor_total).label('valor_total')
+    ).group_by(Produtos.id, Produtos.nome).order_by(func.sum(Transacoes.quantidade).cast(Integer).desc()).all():
+        vendas["rank_vendidos"].append(dict(venda))
+
     return vendas
