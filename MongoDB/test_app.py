@@ -61,3 +61,47 @@ def test_consulta_response(client, mocker):
     decoded_response = dict(ast.literal_eval(response.data.decode('utf-8')))
     assert decoded_response == {
         '_id': 1, 'descricao': 'é fruta, não é legume', 'nome': 'tomate', 'preco': 3.5}
+
+
+def test_atualizacao_status_code(client, mocker):
+    mocker.patch('services.database.consultar', return_value=({
+        "_id": 1,
+        "nome": "tomate",
+        "preco": 3.5,
+        "descricao": "é fruta, não é legume"
+    }, 200))
+    mocker.patch('services.database.atualizar', return_value={})
+    response = client.put("/atualizacao", json={
+        "_id": 1,
+        "nome": "tomate",
+        "preco": 3.5,
+        "descricao": "é fruta, não é legume"
+    })
+    assert response.status_code == 200
+
+
+def test_atualizacao_erro(client, mocker):
+    mocker.patch('services.database.consultar', return_value=({}, 404))
+    response = client.put("/atualizacao", json={'nome': 'teste'})
+    decoded_response = dict(ast.literal_eval(response.data.decode('utf-8')))
+    assert decoded_response == {'error': "Produto não encontrado!"}
+
+
+def test_delecao_status_code(client, mocker):
+    mocker.patch('services.database.consultar', return_value=({
+        "_id": 1,
+        "nome": "tomate",
+        "preco": 3.5,
+        "descricao": "é fruta, não é legume"
+    }, 200))
+    mocker.patch('services.database.deletar', return_value={})
+    response = client.delete("/delecao/Tomate")
+    assert response.status_code == 200
+
+
+def test_delecao_erro(client, mocker):
+    mocker.patch('services.database.consultar', return_value=({}, 404))
+    mocker.patch('services.database.deletar', return_value={})
+    response = client.delete("/delecao/teste")
+    decoded_response = dict(ast.literal_eval(response.data.decode('utf-8')))
+    assert decoded_response == {'error': 'Produto não encontrado!'}
