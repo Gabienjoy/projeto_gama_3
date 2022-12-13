@@ -22,17 +22,9 @@ insert = "INSERT INTO produtos VALUES (:nome,:preco,:qtd);"
 delete = "DELETE FROM produtos WHERE nome = ?;"
 update = '''
 UPDATE produtos SET
-    preco = :preco,
+    qtd = :qtd
 WHERE nome like :nome  
 '''
-
-
-@app.route("/")
-def index():
-    conexao, cursor = abrir_conexao(banco)
-    resultado = cursor.execute(select_todos).fetchone()
-    fechar_conexao(conexao)
-    return {'registros': f'{resultado} alunos'}
 
 @app.route("/add_produto", methods=['POST'])
 def add_produto():
@@ -53,7 +45,7 @@ def leitura():
     fechar_conexao(conexao)
     return resultado, 200
 
-@app.route('/delete/<nome>')
+@app.route('/delete/<nome>', methods=['DELETE'])
 def delete_name(nome):
     conexao, cursor = abrir_conexao(banco)
     resultado = cursor.execute(delete, [nome]).rowcount
@@ -65,23 +57,25 @@ def read_name(nome):
     conexao, cursor = abrir_conexao(banco)
     resultado = cursor.execute(select_nome, [nome]).fetchall()
     fechar_conexao(conexao)
-    return resultado
+    return resultado, 200
 
-@app.route('/update/<nome>')
-#?nome=teste&idade=0&filhos=1&estado=AC&altura=0.07&formacao=Ensino+Superior
-def update_name(nome):
-    consulta = read_name(nome)
-    if consulta: # existe nome no banco de dados
-        produtos=request.args.to_dict() #{chave: valor, chave:valor,...}
-        if produtos: # se tem argumento
+@app.route('/atualizacao/<nome>', methods=['PUT'])
+def atualiza(nome):
+
+    resultado, status = read_name(nome)
+    if status == 200: 
+        if request.get_json(silent=True):
+            produtos = request.json
             conexao, cursor = abrir_conexao(banco)
-            cursor.execute(update, produtos)
+            # aluno['id'] = id
+            resp = {"nome": nome, "qtd": produtos["qtd"]}
+            cursor.execute(update, resp)
             fechar_conexao(conexao)
-            return produtos
-        else: # se não tem argumento
-            return {'error': 'Produto não encontrado!'}
-    else: # não existe nome no banco de dados
-        return {'error': 'Produto não encontrado 1!'}
+            return resp, 200
+        else:
+            return {"Erro": "Produto não encontrado "}
+    else:
+        return {"Erro": "Produto não encontrado"}
 
 if __name__=="__main__":
     app.run(debug=True);
