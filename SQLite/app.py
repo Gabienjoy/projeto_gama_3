@@ -29,17 +29,18 @@ def read_name(nome):
 
 @app.route('/atualizacao/<nome>', methods=['PUT'])
 def atualiza(nome):
-
-    resultado, status = read_name(nome)
-    if status == 200: 
-        if request.get_json(silent=True):
-            produtos = request.json
-            resp = orm.func_update(nome, produtos)
-            return resp, 200
+    try: 
+        resultado, status = read_name(nome)
+        if status == 200: 
+            if request.get_json(silent=True):
+                produtos = request.json
+                resp = orm.func_update(nome, produtos)
+                return resp, 200
+            else:
+                return {"Erro": "Produto não encontrado"}
         else:
-            return {"Erro": "Produto não encontrado "}
-    else:
-        return {"Erro": "Produto não encontrado"}
-
+            return {"Erro": "Produto não encontrado"}
+    except:
+        return {"Erro": "Erro ao atualizar o produto"}
 if __name__=="__main__":
     app.run(debug=True)
