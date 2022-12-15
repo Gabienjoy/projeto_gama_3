@@ -35,7 +35,7 @@ def leitura_nome(nome):
 @app.route('/atualizacao/<nome>', methods=['PUT'])
 def atualiza(nome):
     try:
-        resultado, status = read_name(nome)
+        resultado, status = leitura_nome(nome)
         if status == 200:
             if request.get_json(silent=True):
                 produtos = request.json
