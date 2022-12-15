@@ -3,35 +3,40 @@ import orm
 
 app = Flask(__name__)
 
+
 @app.route("/add_produto", methods=['POST'])
 def add_produto():
     if request.get_json(silent=True):
         produtos = request.json
         orm.insert_produto(produtos)
-        return produtos , 201
+        return produtos, 201
     else:
-        return {"Erro": "Esperava receber um JSON"} , 400
+        return {"Erro": "Esperava receber um JSON"}, 400
 
-@app.route("/leitura")
+
+@app.route("/leitura", methods=['GET'])
 def leitura():
     resultado = orm.func_leitura()
     return resultado, 200
 
-@app.route('/delete/<nome>', methods=['DELETE'])
+
+@app.route('/delecao/<nome>', methods=['DELETE'])
 def delete_name(nome):
     orm.func_delete(nome)
     return {'message': 'Registro removido'}, 200
 
-@app.route('/read/<nome>')
-def read_name(nome):
+
+@app.route('/leitura/<nome>', methods=['GET'])
+def leitura_nome(nome):
     resultado = orm.func_read(nome)
     return resultado, 200
 
+
 @app.route('/atualizacao/<nome>', methods=['PUT'])
 def atualiza(nome):
-    try: 
+    try:
         resultado, status = read_name(nome)
-        if status == 200: 
+        if status == 200:
             if request.get_json(silent=True):
                 produtos = request.json
                 resp = orm.func_update(nome, produtos)
@@ -42,5 +47,7 @@ def atualiza(nome):
             return {"Erro": "Produto não encontrado"}
     except:
         return {"Erro": "Erro ao atualizar o produto"}
-if __name__=="__main__":
-    app.run(debug=True)
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
